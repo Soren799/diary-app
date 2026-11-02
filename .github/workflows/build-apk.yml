@@ -25,9 +25,10 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      # 装命令行工具 + 预接受 license，Gradle 首跑会自动补齐缺的平台包
-      - name: 安装 Android SDK
-        uses: android-actions/setup-android@v3
+      # Android SDK 不用单独装：ubuntu-latest 镜像已预装（ANDROID_HOME + licenses 均就绪），
+      # 缺的平台包 Gradle 会自动下载。
+      # 也不可用 android-actions/setup-android@v3 —— 它会尝试安装已被 Google 下架的
+      # `tools` 包，必然失败（Warning: Failed to find package 'tools'）。
 
       - name: 安装依赖并构建网页
         run: |
