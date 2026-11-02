@@ -6,6 +6,10 @@ on:
   push:
     branches: [main]
 
+# 允许用内置 GITHUB_TOKEN 创建 Release
+permissions:
+  contents: write
+
 jobs:
   build-apk:
     runs-on: ubuntu-latest
@@ -49,6 +53,7 @@ jobs:
           CODE=${{ github.run_number }}
           sed -i "s/versionCode [0-9]*/versionCode $CODE/" android/app/build.gradle
           sed -i "s/versionName \".*\"/versionName \"$VERSION\"/" android/app/build.gradle
+          echo "APP_VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "versionName=$VERSION versionCode=$CODE"
 
       # 签名延续：不再依赖 AGP 对 ~/.android/debug.keystore 的自动发现（实测它会
@@ -94,8 +99,21 @@ jobs:
             && echo "✓ 签名与固定钥匙一致" \
             || (echo "✗ 签名不匹配！" && exit 1)
 
-      - name: 上传 APK
+      - name: 上传 APK（Artifacts，需登录下载）
         uses: actions/upload-artifact@v4
         with:
           name: whim-diary-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      # 发布到 Releases：仓库页直接可下载（公开仓库无需任何登录）
+      - name: 发布到 Releases
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk "奇想日记-v$VERSION.apk"
+          gh release create "v$VERSION" "奇想日记-v$VERSION.apk" \
+            --title "v$VERSION" \
+            --notes "versionCode=$CODE 自动构建" --clobber \
+            || gh release upload "v$VERSION" "奇想日记-v$VERSION.apk" --clobber
+        env:
+          VERSION: ${{ env.APP_VERSION }}
+          CODE: ${{ github.run_number }}
+          GH_TOKEN: ${{ github.token }}
