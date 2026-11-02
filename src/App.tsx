@@ -19,9 +19,11 @@ function routeKey(route: Route): string {
 }
 
 const screenVariants: Variants = {
-  enter: (dir: number) => ({ opacity: 0, x: dir >= 0 ? 44 : -44 }),
-  center: { opacity: 1, x: 0 },
-  exit: (dir: number) => ({ opacity: 0, x: dir >= 0 ? -24 : 24 }),
+  enter: (dir: number) => ({ opacity: 0, x: dir >= 0 ? 44 : -44, zIndex: 2 }),
+  center: { opacity: 1, x: 0, zIndex: 1 },
+  // 退场只做快速淡出、不带位移：即使极端情况下退场节点滞留 DOM，
+  // 也是一个近乎全透明的不可见层，不会造成视觉堆叠
+  exit: { opacity: 0, zIndex: 1, transition: { duration: 0.16, ease: 'linear' } },
 }
 
 export default function App() {
@@ -78,10 +80,9 @@ export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <Background />
-      {/* 页面转场：方向感知的推入 / 返回（系统开启减弱动效时自动退化为淡入淡出）。
-          mode="wait"：旧屏完全退场后新屏再入场——popLayout 在当前 React 19 +
-          motion 组合下退场节点不会卸载，会层层叠住，故不用。 */}
-      <AnimatePresence initial={false} custom={direction} mode="wait">
+      {/* 页面转场：方向感知的推入 / 返回，双屏交叠淡入淡出（无空窗闪烁）。
+          系统开启减弱动效时自动退化为瞬切。 */}
+      <AnimatePresence initial={false} custom={direction} mode="popLayout">
         <motion.div
           key={routeKey(route)}
           custom={direction}

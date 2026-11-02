@@ -269,10 +269,10 @@ const GlassSurface = ({
       }
       return {
         ...baseStyles,
-        // 触屏/降级档：底色压到很淡（更透），模糊也收浅一点，磨砂只留一层意思
-        background: 'rgba(255, 255, 255, 0.05)',
-        backdropFilter: `blur(${4 + frost}px) saturate(1.8) brightness(1.15)`,
-        WebkitBackdropFilter: `blur(${4 + frost}px) saturate(1.8) brightness(1.15)`,
+        // 触屏/降级档：底色压到极淡（更透），模糊收细，磨砂只留一层意思
+        background: 'rgba(255, 255, 255, 0.03)',
+        backdropFilter: `blur(${3 + frost}px) saturate(1.8) brightness(1.1)`,
+        WebkitBackdropFilter: `blur(${3 + frost}px) saturate(1.8) brightness(1.1)`,
         border: '1px solid rgba(255, 255, 255, 0.2)',
         boxShadow: `inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
                     inset 0 -1px 0 0 rgba(255, 255, 255, 0.1)`,
@@ -290,9 +290,9 @@ const GlassSurface = ({
     }
     return {
       ...baseStyles,
-      background: 'rgba(255, 255, 255, 0.12)',
-      backdropFilter: `blur(${4 + frost}px) saturate(1.8) brightness(1.1)`,
-      WebkitBackdropFilter: `blur(${4 + frost}px) saturate(1.8) brightness(1.1)`,
+      background: 'rgba(255, 255, 255, 0.08)',
+      backdropFilter: `blur(${3 + frost}px) saturate(1.8) brightness(1.1)`,
+      WebkitBackdropFilter: `blur(${3 + frost}px) saturate(1.8) brightness(1.1)`,
       border: '1px solid rgba(255, 255, 255, 0.3)',
       boxShadow: `0 8px 32px 0 rgba(31, 38, 135, 0.12),
                   0 2px 16px 0 rgba(31, 38, 135, 0.06),
