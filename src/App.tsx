@@ -90,7 +90,7 @@ export default function App() {
           animate="center"
           exit="exit"
           transition={{ duration: 0.26, ease: EASE }}
-          style={{ width: '100%', willChange: 'transform' }}
+          style={{ width: '100%' }}
           className="relative"
         >
           {content}

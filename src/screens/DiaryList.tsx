@@ -181,11 +181,24 @@ function DayCard({
             </span>
           )}
           <span className="flex items-center gap-1.5">
-            {day.entries.map(entry =>
-              entry.mood ? (
-                <MoodFace key={entry.id} mood={entry.mood} className="w-[18px] shrink-0 text-ink-3" />
-              ) : null,
-            )}
+            {(() => {
+              const moods = day.entries.filter(entry => entry.mood)
+              const shown = moods.slice(0, 5)
+              return (
+                <>
+                  {shown.map(entry => (
+                    <MoodFace
+                      key={entry.id}
+                      mood={entry.mood!}
+                      className="w-[18px] shrink-0 text-ink-3"
+                    />
+                  ))}
+                  {moods.length > 5 && (
+                    <span className="text-[10px] tabular-nums text-ink-3">+{moods.length - 5}</span>
+                  )}
+                </>
+              )
+            })()}
           </span>
           <span className="ml-auto shrink-0 text-[11px] tabular-nums text-ink-3">
             {day.entries.length} 笔 · 至 {formatClock(last.time)}
