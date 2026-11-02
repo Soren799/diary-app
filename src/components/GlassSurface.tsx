@@ -67,6 +67,12 @@ function supportsSVGFilters(filterId: string): boolean {
     return false
   }
 
+  // 触屏真机不走 SVG 位移折射：backdrop-filter: url() 在移动 GPU 上逐帧重算代价高，
+  // 而小屏上折射本身几乎不可见——退回普通磨玻璃，观感几乎一致，滚动明显更顺。
+  if (window.matchMedia?.('(pointer: coarse)').matches) {
+    return false
+  }
+
   const div = document.createElement('div')
   div.style.backdropFilter = `url(#${filterId})`
 
@@ -264,8 +270,8 @@ const GlassSurface = ({
       return {
         ...baseStyles,
         background: 'rgba(255, 255, 255, 0.1)',
-        backdropFilter: `blur(${8 + frost}px) saturate(1.8) brightness(1.2)`,
-        WebkitBackdropFilter: `blur(${8 + frost}px) saturate(1.8) brightness(1.2)`,
+        backdropFilter: `blur(${6 + frost}px) saturate(1.8) brightness(1.2)`,
+        WebkitBackdropFilter: `blur(${6 + frost}px) saturate(1.8) brightness(1.2)`,
         border: '1px solid rgba(255, 255, 255, 0.2)',
         boxShadow: `inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
                     inset 0 -1px 0 0 rgba(255, 255, 255, 0.1)`,
@@ -284,8 +290,8 @@ const GlassSurface = ({
     return {
       ...baseStyles,
       background: 'rgba(255, 255, 255, 0.25)',
-      backdropFilter: `blur(${8 + frost}px) saturate(1.8) brightness(1.1)`,
-      WebkitBackdropFilter: `blur(${8 + frost}px) saturate(1.8) brightness(1.1)`,
+      backdropFilter: `blur(${6 + frost}px) saturate(1.8) brightness(1.1)`,
+      WebkitBackdropFilter: `blur(${6 + frost}px) saturate(1.8) brightness(1.1)`,
       border: '1px solid rgba(255, 255, 255, 0.3)',
       boxShadow: `0 8px 32px 0 rgba(31, 38, 135, 0.12),
                   0 2px 16px 0 rgba(31, 38, 135, 0.06),

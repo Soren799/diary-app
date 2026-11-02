@@ -34,6 +34,14 @@
   --card-highlight: rgba(255, 255, 255, 0.85);
   --shadow-card: 0 16px 36px -26px rgba(60, 50, 90, 0.28);
   --glass-tint: rgba(255, 255, 255, 0.3);
+
+  /* 安全区（刘海/手势条）：Capacitor 全屏下 WebView 可能不上报 env()，
+     main.tsx 会按原生平台补一个保守的兜底值，两者取较大者 */
+  --safe-top: max(env(safe-area-inset-top, 0px), var(--native-safe-top, 0px));
+  --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--native-safe-bottom, 0px));
+
+  /* 触屏档位下 .card 的实色底（替代 backdrop-filter 的等观感方案） */
+  --card-solid: #fbfaf8;
 }
 
 .dark {
@@ -56,6 +64,7 @@
   --card-highlight: rgba(255, 255, 255, 0.04);
   --shadow-card: 0 18px 40px -30px rgba(0, 0, 0, 0.9);
   --glass-tint: rgba(255, 255, 255, 0.05);
+  --card-solid: #121214;
 }
 
 @theme inline {
@@ -189,6 +198,18 @@
     .card:hover {
       transform: translateY(-2px);
       border-color: var(--line-strong);
+    }
+  }
+
+  /* ---- 触屏真机的性能档 ----
+     手机 GPU 上逐帧合成 backdrop-filter 代价高，而卡片背后几乎总是纯色纸底，
+     去掉模糊换成等观感的实色，肉眼无差、滚动明显更顺。
+     玻璃件（顶栏/记录条等背后有滚动内容的）在 GlassSurface 内部降级为磨砂。 */
+  @media (pointer: coarse) {
+    .card {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background: var(--card-solid);
     }
   }
 

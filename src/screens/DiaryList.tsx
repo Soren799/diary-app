@@ -40,8 +40,8 @@ export default function DiaryList({ days, onOpenDay }: DiaryListProps) {
 
   return (
     <div className="relative mx-auto flex min-h-svh w-full max-w-[440px] flex-col px-4">
-      {/* 顶部悬浮玻璃栏 */}
-      <div className="sticky top-3 z-30 pt-3">
+      {/* 顶部悬浮玻璃栏（避开系统状态栏：--safe-top 见 index.css） */}
+      <div className="sticky top-0 z-30" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
         <GlassSurface width="100%" height={56} borderRadius={28}>
           <div className="flex w-full items-center justify-between px-2.5">
             <div className="flex items-center gap-2.5 pl-0.5">
@@ -100,14 +100,16 @@ export default function DiaryList({ days, onOpenDay }: DiaryListProps) {
         ))
       )}
 
-      <p className="pb-6 pt-12 text-center text-[11px] text-ink-3">
-        示例数据 · 仅保存在这台设备上
-      </p>
+      {/* 底部留白：给悬浮的 FAB 让位 */}
+      <div className="h-24" />
 
       {/* FAB：记今天的日记 */}
       <div
-        className="pointer-events-none fixed bottom-6 z-30"
-        style={{ right: 'max(1.5rem, calc(50% - 220px + 1.5rem))' }}
+        className="pointer-events-none fixed z-30"
+        style={{
+          right: 'max(1.5rem, calc(50% - 220px + 1.5rem))',
+          bottom: 'calc(1.5rem + var(--safe-bottom))',
+        }}
       >
         <GlassSurface width={56} height={56} borderRadius={999} className="pointer-events-auto">
           <button

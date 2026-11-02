@@ -99,8 +99,8 @@ export default function DiaryDayScreen({ date, day, onBack, onSaveEntry, onDelet
 
   return (
     <div className="relative mx-auto flex min-h-svh w-full max-w-[440px] flex-col px-4">
-      {/* 返回 */}
-      <div className="sticky top-3 z-30 pt-3">
+      {/* 返回（避开系统状态栏：--safe-top 见 index.css） */}
+      <div className="sticky top-0 z-30" style={{ paddingTop: 'calc(0.75rem + var(--safe-top))' }}>
         <GlassSurface width={84} height={40} borderRadius={999}>
           <button
             type="button"
@@ -195,8 +195,11 @@ export default function DiaryDayScreen({ date, day, onBack, onSaveEntry, onDelet
         </div>
       )}
 
-      {/* 底部玻璃记录条 */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-4">
+      {/* 底部玻璃记录条（避开手势条：--safe-bottom 见 index.css） */}
+      <div
+        className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-4"
+        style={{ paddingBottom: 'calc(1rem + var(--safe-bottom))' }}
+      >
         <GlassSurface
           width="100%"
           height="auto"
