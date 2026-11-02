@@ -41,6 +41,16 @@ jobs:
           npx cap add android
           npx cap sync
 
+      # 版本延续：versionName 取 package.json（发版时改它），versionCode 取
+      # run_number（每次构建单调递增），保证新包能覆盖安装旧包。
+      - name: 写入版本号
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          CODE=${{ github.run_number }}
+          sed -i "s/versionCode [0-9]*/versionCode $CODE/" android/app/build.gradle
+          sed -i "s/versionName \".*\"/versionName \"$VERSION\"/" android/app/build.gradle
+          echo "versionName=$VERSION versionCode=$CODE"
+
       - name: 打包 Debug APK
         run: |
           cd android

@@ -23,8 +23,14 @@ npm run build    # tsc --noEmit && vite build
 
 ## 数据
 
-`src/lib/store.ts`：localStorage key `diary.days.v1`。想重置示例数据，
-控制台执行 `localStorage.removeItem('diary.days.v1')` 后刷新。
+`src/lib/store.ts`：localStorage key `diary.days.v2`（v1 时代的种子数据会在首次加载时
+被剔除并迁移，自己写的内容保留）。空态即首启状态，没有种子数据。
+
+## 版本
+
+发版只改一处：`package.json` 的 `version`（对齐语义化：界面/功能小改升 patch，
+加功能升 minor）。CI 自动把它写进安卓工程的 `versionName`，`versionCode` 取
+GitHub 的 run_number 单调递增——所以新包永远能覆盖安装旧包。
 
 ## 结构
 
