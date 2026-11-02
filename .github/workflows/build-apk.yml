@@ -51,18 +51,48 @@ jobs:
           sed -i "s/versionName \".*\"/versionName \"$VERSION\"/" android/app/build.gradle
           echo "versionName=$VERSION versionCode=$CODE"
 
-      # 签名延续：把 Secrets 里的固定调试签名恢复到 ~/.android/debug.keystore，
-      # 每次 build 都用同一把钥匙——新包才能覆盖安装旧包（否则签名不符会拒绝安装）。
-      - name: 恢复稳定的调试签名
+      # 签名延续：不再依赖 AGP 对 ~/.android/debug.keystore 的自动发现（实测它会
+      # 因读不了 openssl 生成的 PKCS12 而静默换随机钥匙），而是在 gradle 里显式
+      # 指定签名配置，每次构建用同一把钥匙。
+      - name: 写入稳定签名并显式配置
         run: |
-          mkdir -p ~/.android
-          echo "${{ secrets.ANDROID_DEBUG_KEYSTORE_B64 }}" | base64 -d > ~/.android/debug.keystore
+          echo "${{ secrets.ANDROID_DEBUG_KEYSTORE_B64 }}" | base64 -d > android/cd-debug.keystore
+          keytool -list -keystore android/cd-debug.keystore -storepass android -alias androiddebugkey >/dev/null \
+            && echo "✓ 固定钥匙可读" || (echo "✗ 固定钥匙不可读！" && exit 1)
+          cat >> android/app/build.gradle <<'GRADLE'
+
+          android {
+              signingConfigs {
+                  cd {
+                      storeFile rootProject.file("cd-debug.keystore")
+                      storePassword "android"
+                      keyAlias "androiddebugkey"
+                      keyPassword "android"
+                  }
+              }
+              buildTypes {
+                  debug {
+                      signingConfig signingConfigs.cd
+                  }
+              }
+          }
+          GRADLE
 
       - name: 打包 Debug APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
+
+      - name: 校验签名指纹（与固定钥匙不一致则构建失败）
+        run: |
+          APKSIGNER=$(ls $ANDROID_HOME/build-tools/*/apksigner | sort | tail -1)
+          $APKSIGNER verify --print-certs android/app/build/outputs/apk/debug/app-debug.apk > /tmp/certs.txt
+          cat /tmp/certs.txt
+          EXPECT=$(echo "FF:B9:EA:E5:14:AE:5D:13:A6:3D:3D:9E:C5:ED:0D:E0:B3:4A:65:94:4F:85:07:A8:31:08:61:AB:05:B6:92:C3" | tr -d ':' | tr 'A-Z' 'a-z')
+          grep -qi "$EXPECT" /tmp/certs.txt \
+            && echo "✓ 签名与固定钥匙一致" \
+            || (echo "✗ 签名不匹配！" && exit 1)
 
       - name: 上传 APK
         uses: actions/upload-artifact@v4
