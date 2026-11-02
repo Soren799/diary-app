@@ -1,0 +1,246 @@
+@import 'tailwindcss';
+
+/* 深色主题走 class 策略（.dark 挂在 html 上），而不是跟随系统媒体查询——
+   因为 App 内有手动切换，得能覆盖系统偏好。 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ------------------------------------------------------------------ *
+ * 设计 token —— 延续网站的中性冷灰 + 低饱和暗紫（#9B8FBF），
+ * 但从「强制深色」扩成浅 / 深双主题：同一批语义名，两套值。
+ * 浅色是暖纸底，深色沿用网站的 void 底。
+ * ------------------------------------------------------------------ */
+:root {
+  /* 面：页面底 → 卡片 → 抬升的卡片 */
+  --paper: #f4f3f0;
+  --card: rgba(255, 255, 255, 0.66);
+  --card-strong: rgba(255, 255, 255, 0.9);
+
+  /* 字：主 → 次 → 弱 */
+  --ink: #232127;
+  --ink-2: #6c6875;
+  --ink-3: #a09caa;
+
+  /* 线 */
+  --line: rgba(35, 33, 39, 0.1);
+  --line-strong: rgba(35, 33, 39, 0.2);
+
+  /* 唯一点缀色：低饱和暗紫（浅色下用更深的变体做可交互文字） */
+  --brand: #9b8fbf;
+  --brand-ink: #6f629e;
+  --brand-soft: rgba(155, 143, 191, 0.16);
+
+  /* 背景光晕 / 卡片内高光 / 卡片阴影 */
+  --glow: rgba(155, 143, 191, 0.14);
+  --card-highlight: rgba(255, 255, 255, 0.85);
+  --shadow-card: 0 16px 36px -26px rgba(60, 50, 90, 0.28);
+  --glass-tint: rgba(255, 255, 255, 0.3);
+}
+
+.dark {
+  --paper: #09090b;
+  --card: rgba(255, 255, 255, 0.035);
+  --card-strong: rgba(255, 255, 255, 0.065);
+
+  --ink: #f4f4f5;
+  --ink-2: #a1a1a6;
+  --ink-3: #6e6e76;
+
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.17);
+
+  --brand: #9b8fbf;
+  --brand-ink: #bab0d8;
+  --brand-soft: rgba(155, 143, 191, 0.14);
+
+  --glow: rgba(155, 143, 191, 0.1);
+  --card-highlight: rgba(255, 255, 255, 0.04);
+  --shadow-card: 0 18px 40px -30px rgba(0, 0, 0, 0.9);
+  --glass-tint: rgba(255, 255, 255, 0.05);
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-card-strong: var(--card-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+}
+
+@theme {
+  --font-sans:
+    system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Noto Sans SC', sans-serif;
+  --font-serif: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', 'JetBrains Mono', Consolas, monospace;
+
+  --radius-4xl: 2rem;
+}
+
+/* ------------------------------------------------------------------ *
+ * 基础层
+ * ------------------------------------------------------------------ */
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  .dark {
+    color-scheme: dark;
+  }
+
+  /* html 铺底色：橡皮筋回弹时不会露出浏览器默认的白 */
+  html {
+    background-color: var(--paper);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+    margin: 0;
+    min-height: 100svh;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-ink;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: default;
+  }
+
+  input,
+  textarea,
+  button,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  textarea {
+    resize: none;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--brand) 30%, transparent);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--ink) 12%, transparent) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--ink) 12%, transparent);
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background-clip: content-box;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * 组件层
+ * ------------------------------------------------------------------ */
+@layer components {
+  /* ---- 卡片：轻玻璃、细边框、柔和阴影（网站的 .card，换成双主题变量） ---- */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow:
+      inset 0 1px 0 var(--card-highlight),
+      var(--shadow-card);
+    transition:
+      transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.22s ease,
+      background 0.22s ease;
+  }
+  @media (hover: hover) {
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: var(--line-strong);
+    }
+  }
+
+  /* ---- 幽灵图标钮 ---- */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    color: var(--ink-2);
+    transition:
+      color 0.2s ease,
+      background 0.2s ease;
+  }
+  .btn-ghost:hover {
+    color: var(--ink);
+    background: var(--brand-soft);
+  }
+
+  /* ---- 极淡噪点，压住大面积纯色的「塑料感」 ---- */
+  .noise {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+  }
+
+  /* ---- 页面切换入场 ----
+     填充模式必须是 backwards 而不是 both：both 会在动画结束后继续保留
+     transform 状态，而带 transform 的元素会成为内部 position:fixed
+     后代的定位基准——FAB、记录条、渐进模糊就会钉在页面底端而不是视口上。 */
+  .screen {
+    animation: screen-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+  @keyframes screen-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
