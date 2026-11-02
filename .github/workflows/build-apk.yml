@@ -51,6 +51,13 @@ jobs:
           sed -i "s/versionName \".*\"/versionName \"$VERSION\"/" android/app/build.gradle
           echo "versionName=$VERSION versionCode=$CODE"
 
+      # 签名延续：把 Secrets 里的固定调试签名恢复到 ~/.android/debug.keystore，
+      # 每次 build 都用同一把钥匙——新包才能覆盖安装旧包（否则签名不符会拒绝安装）。
+      - name: 恢复稳定的调试签名
+        run: |
+          mkdir -p ~/.android
+          echo "${{ secrets.ANDROID_DEBUG_KEYSTORE_B64 }}" | base64 -d > ~/.android/debug.keystore
+
       - name: 打包 Debug APK
         run: |
           cd android

@@ -3,23 +3,24 @@
  * 顶部是一条悬浮的玻璃栏（品牌 + 统计 + 主题切换），右下角玻璃 FAB 直达今天。
  */
 import { useMemo } from 'react'
-import { Moon, Plus, Sun } from 'lucide-react'
+import { motion } from 'motion/react'
+import { Menu, Plus } from 'lucide-react'
 import GlassSurface from '@/components/GlassSurface'
 import GradualBlur from '@/components/GradualBlur'
 import MoodFace from '@/components/MoodFace'
+import { EASE } from '@/lib/animation'
 import { formatClock, monthLabel, monthOf, todayKey, weekdayOf, yearOf } from '@/lib/format'
 import { sortedDays } from '@/lib/store'
-import { toggleTheme, useTheme } from '@/lib/theme'
 import type { DiaryDay } from '@/lib/types'
 import { cn } from '@/lib/cn'
 
 interface DiaryListProps {
   days: DiaryDay[]
   onOpenDay: (date: string) => void
+  onOpenSettings: () => void
 }
 
-export default function DiaryList({ days, onOpenDay }: DiaryListProps) {
-  const theme = useTheme()
+export default function DiaryList({ days, onOpenDay, onOpenSettings }: DiaryListProps) {
   const today = todayKey()
   const sorted = useMemo(() => sortedDays(days), [days])
 
@@ -54,11 +55,11 @@ export default function DiaryList({ days, onOpenDay }: DiaryListProps) {
               </span>
               <button
                 type="button"
-                onClick={toggleTheme}
+                onClick={onOpenSettings}
                 className="btn-ghost size-8"
-                aria-label={theme === 'dark' ? '切换到浅色' : '切换到深色'}
+                aria-label="打开设置"
               >
-                {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                <Menu size={16} />
               </button>
             </div>
           </div>
@@ -92,8 +93,15 @@ export default function DiaryList({ days, onOpenDay }: DiaryListProps) {
               <div className="h-px flex-1 bg-line" />
             </div>
             <div className="flex flex-col gap-2.5">
-              {group.days.map(day => (
-                <DayCard key={day.date} day={day} today={today} onOpen={onOpenDay} />
+              {group.days.map((day, index) => (
+                <motion.div
+                  key={day.date}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, ease: EASE, delay: Math.min(index * 0.05, 0.3) }}
+                >
+                  <DayCard day={day} today={today} onOpen={onOpenDay} />
+                </motion.div>
               ))}
             </div>
           </section>
@@ -142,9 +150,11 @@ function DayCard({
   const last = day.entries[day.entries.length - 1]
 
   return (
-    <button
+    <motion.button
       type="button"
       onClick={() => onOpen(day.date)}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: 'spring', stiffness: 600, damping: 30 }}
       className="card flex w-full items-start gap-4 rounded-2xl px-4 py-3.5 text-left"
     >
       {/* 日期竖块 */}
@@ -185,6 +195,6 @@ function DayCard({
           {first.text}
         </p>
       </div>
-    </button>
+    </motion.button>
   )
 }

@@ -4,12 +4,14 @@
  * 记录条的时刻自动取当下，不需要手填——沿用网站日记页的约定。
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { ArrowUp, Check, ChevronLeft, Clock3, PenLine, Trash2, X } from 'lucide-react'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import GlassSurface from '@/components/GlassSurface'
 import GradualBlur from '@/components/GradualBlur'
 import MoodPicker from '@/components/MoodPicker'
 import MoodFace from '@/components/MoodFace'
+import { EASE } from '@/lib/animation'
 import { formatClock, monthLabel, parseDateKey, weekdayOf, yearOf } from '@/lib/format'
 import { moodOf } from '@/lib/mood'
 import { uid } from '@/lib/store'
@@ -132,21 +134,27 @@ export default function DiaryDayScreen({ date, day, onBack, onSaveEntry, onDelet
         )}
       </header>
 
-      {/* 时间线 */}
+      {/* 时间线：新记录滑入、删除收起，都在这里发生 */}
       {entries.length > 0 ? (
         <div className="flex flex-col gap-2.5 pb-36">
-          {entries.map(entry => {
-            const mood = moodOf(entry.mood)
-            const isEditing = entry.id === editingId
-            return (
-              <article
-                key={entry.id}
-                className={cn(
-                  'card cursor-pointer rounded-2xl px-4 py-3.5',
-                  isEditing && 'border-brand-ink/40 ring-1 ring-brand',
-                )}
-                onClick={() => !isEditing && startEdit(entry)}
-              >
+          <AnimatePresence initial={false} mode="popLayout">
+            {entries.map(entry => {
+              const mood = moodOf(entry.mood)
+              const isEditing = entry.id === editingId
+              return (
+                <motion.article
+                  key={entry.id}
+                  layout
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.24, ease: EASE }}
+                  className={cn(
+                    'card cursor-pointer rounded-2xl px-4 py-3.5',
+                    isEditing && 'border-brand-ink/40 ring-1 ring-brand',
+                  )}
+                  onClick={() => !isEditing && startEdit(entry)}
+                >
                 <div className="flex items-center gap-2.5">
                   <span className="font-mono text-xs tabular-nums text-ink-3">
                     {formatClock(entry.time)}
@@ -185,9 +193,10 @@ export default function DiaryDayScreen({ date, day, onBack, onSaveEntry, onDelet
                 <p className="mt-2 text-[15px] leading-[1.85] whitespace-pre-wrap text-ink">
                   {entry.text}
                 </p>
-              </article>
-            )
-          })}
+              </motion.article>
+              )
+            })}
+          </AnimatePresence>
         </div>
       ) : (
         <div className="flex flex-1 items-center justify-center pb-44">

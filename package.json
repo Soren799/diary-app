@@ -1,7 +1,7 @@
 {
   "name": "diary-app",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,6 +12,7 @@
     "@capacitor/android": "^8.6.0",
     "@capacitor/core": "^8.6.0",
     "lucide-react": "^1.48.0",
+    "motion": "^13.5.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

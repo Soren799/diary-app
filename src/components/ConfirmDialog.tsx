@@ -26,14 +26,14 @@ export default function ConfirmDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6 backdrop-blur-sm"
+      className="backdrop-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6 backdrop-blur-sm"
       onClick={onCancel}
       role="dialog"
       aria-modal="true"
       aria-label={title}
     >
       <div
-        className="card w-full max-w-[320px] rounded-2xl p-5"
+        className="card dialog-in w-full max-w-[320px] rounded-2xl p-5"
         style={{ background: 'var(--card-strong)' }}
         onClick={event => event.stopPropagation()}
       >

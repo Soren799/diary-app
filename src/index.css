@@ -106,6 +106,7 @@
   html {
     background-color: var(--paper);
     -webkit-text-size-adjust: 100%;
+    transition: background-color 0.35s ease;
   }
 
   body {
@@ -118,6 +119,10 @@
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
+    /* 浅 / 深切换时底色与文字跟着渐变，而不是硬切 */
+    transition:
+      background-color 0.35s ease,
+      color 0.35s ease;
   }
 
   h1,
@@ -235,17 +240,25 @@
     opacity: 0.03;
   }
 
-  /* ---- 页面切换入场 ----
-     填充模式必须是 backwards 而不是 both：both 会在动画结束后继续保留
-     transform 状态，而带 transform 的元素会成为内部 position:fixed
-     后代的定位基准——FAB、记录条、渐进模糊就会钉在页面底端而不是视口上。 */
-  .screen {
-    animation: screen-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  /* ---- 确认弹窗入场（页面转场由 motion 负责，这里只管纯 CSS 的小件） ---- */
+  .backdrop-in {
+    animation: backdrop-in 0.2s ease both;
   }
-  @keyframes screen-in {
+  .dialog-in {
+    animation: dialog-in 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes backdrop-in {
     from {
       opacity: 0;
-      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.96);
     }
     to {
       opacity: 1;
@@ -255,9 +268,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .screen {
-    animation: none;
-  }
   *,
   *::before,
   *::after {
