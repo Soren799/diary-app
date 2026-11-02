@@ -19,11 +19,11 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: 安装 JDK 17
+      - name: 安装 JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
       # Android SDK 不用单独装：ubuntu-latest 镜像已预装（ANDROID_HOME + licenses 均就绪），
       # 缺的平台包 Gradle 会自动下载。
