@@ -131,7 +131,7 @@ export default function DiaryList({ days, onOpenDay, onOpenSettings }: DiaryList
         </GlassSurface>
       </div>
 
-      <GradualBlur position="top" height="3.5rem" strength={2} divCount={4} />
+      <GradualBlur position="top" height="3.5rem" strength={1.8} divCount={3} />
     </div>
   )
 }

@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Capacitor } from '@capacitor/core'
 import '@/index.css'
@@ -12,8 +11,7 @@ if (Capacitor.isNativePlatform()) {
   document.documentElement.style.setProperty('--native-safe-bottom', '20px')
 }
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+// 刻意不包 <StrictMode>：它的「双挂载」会与 motion 的 AnimatePresence 转场
+// 在开发模式下冲突（退场动画中断，旧页面残留在 DOM 里盖住新页面）。
+
+createRoot(document.getElementById('root')!).render(<App />)

@@ -4,6 +4,15 @@
    因为 App 内有手动切换，得能覆盖系统偏好。 */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* 触屏没有真正的 hover：手机浏览器在手指抬起后仍保留 :hover（sticky hover），
+   点过的按钮会一直保持深色直到点到别处。把所有 hover: 变体门控在
+   「指针精确 + 支持悬停」的设备上，触屏端彻底没有 hover 态。 */
+@custom-variant hover {
+  @media (hover: hover) {
+    &:hover;
+  }
+}
+
 /* ------------------------------------------------------------------ *
  * 设计 token —— 延续网站的中性冷灰 + 低饱和暗紫（#9B8FBF），
  * 但从「强制深色」扩成浅 / 深双主题：同一批语义名，两套值。
@@ -229,9 +238,11 @@
       color 0.2s ease,
       background 0.2s ease;
   }
-  .btn-ghost:hover {
-    color: var(--ink);
-    background: var(--brand-soft);
+  @media (hover: hover) {
+    .btn-ghost:hover {
+      color: var(--ink);
+      background: var(--brand-soft);
+    }
   }
 
   /* ---- 极淡噪点，压住大面积纯色的「塑料感」 ---- */

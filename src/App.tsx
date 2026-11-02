@@ -19,9 +19,9 @@ function routeKey(route: Route): string {
 }
 
 const screenVariants: Variants = {
-  enter: (dir: number) => ({ opacity: 0, x: dir >= 0 ? 44 : -44, zIndex: dir >= 0 ? 2 : 1 }),
-  center: { opacity: 1, x: 0, zIndex: 1 },
-  exit: (dir: number) => ({ opacity: 0, x: dir >= 0 ? -28 : 28, zIndex: dir >= 0 ? 1 : 2 }),
+  enter: (dir: number) => ({ opacity: 0, x: dir >= 0 ? 44 : -44 }),
+  center: { opacity: 1, x: 0 },
+  exit: (dir: number) => ({ opacity: 0, x: dir >= 0 ? -24 : 24 }),
 }
 
 export default function App() {
@@ -37,6 +37,8 @@ export default function App() {
   function navigate(next: Route) {
     setDirection(DEPTH[next.name] >= DEPTH[route.name] ? 1 : -1)
     setRoute(next)
+    // 新页面从顶部打开：列表页滚到一半点进日记，不能带着旧滚动位置
+    window.scrollTo({ top: 0 })
   }
 
   let content: React.ReactNode
@@ -76,8 +78,10 @@ export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <Background />
-      {/* 页面转场：方向感知的推入 / 返回（系统开启减弱动效时自动退化为淡入淡出） */}
-      <AnimatePresence initial={false} custom={direction} mode="popLayout">
+      {/* 页面转场：方向感知的推入 / 返回（系统开启减弱动效时自动退化为淡入淡出）。
+          mode="wait"：旧屏完全退场后新屏再入场——popLayout 在当前 React 19 +
+          motion 组合下退场节点不会卸载，会层层叠住，故不用。 */}
+      <AnimatePresence initial={false} custom={direction} mode="wait">
         <motion.div
           key={routeKey(route)}
           custom={direction}
@@ -85,8 +89,8 @@ export default function App() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: 0.32, ease: EASE }}
-          style={{ width: '100%' }}
+          transition={{ duration: 0.26, ease: EASE }}
+          style={{ width: '100%', willChange: 'transform' }}
           className="relative"
         >
           {content}
